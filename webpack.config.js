@@ -50,7 +50,7 @@ module.exports = (env, argv) => {
         directory: path.join(__dirname, "dist"),
       },
       hot: true,
-      port: 3000,
+      port: process.env.PORT,
       open: true,
       historyApiFallback: true,
     },
