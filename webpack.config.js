@@ -17,6 +17,7 @@ module.exports = (env, argv) => {
       libraryTarget: "umd",
       globalObject: "this",
       libraryExport: "default",
+      clean: true, // Clean the output directory before emit
     },
     module: {
       rules: [
@@ -24,7 +25,9 @@ module.exports = (env, argv) => {
           test: /\.jsx?$/,
           exclude: /node_modules/,
           loader: "babel-loader",
-          options: { presets: ["@babel/preset-env", "@babel/preset-react"] },
+          options: {
+            presets: ["@babel/preset-env", "@babel/preset-react"],
+          },
         },
         {
           test: /\.css$/,
@@ -44,7 +47,9 @@ module.exports = (env, argv) => {
         patterns: [{ from: "public", to: "." }],
       }),
     ],
-    resolve: { extensions: [".js", ".jsx"] },
+    resolve: {
+      extensions: [".js", ".jsx"],
+    },
     devServer: {
       static: {
         directory: path.join(__dirname, "dist"),
@@ -55,5 +60,22 @@ module.exports = (env, argv) => {
       historyApiFallback: true,
     },
     devtool: isDevelopment ? "eval-source-map" : false,
+    externals: isDevelopment
+      ? {}
+      : {
+          // In production, expect React to be provided by the host page
+          react: {
+            commonjs: "react",
+            commonjs2: "react",
+            amd: "React",
+            root: "React",
+          },
+          "react-dom": {
+            commonjs: "react-dom",
+            commonjs2: "react-dom",
+            amd: "ReactDOM",
+            root: "ReactDOM",
+          },
+        },
   };
 };

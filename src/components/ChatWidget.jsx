@@ -291,8 +291,8 @@ const ThemeAnalysis = ({ themes }) => {
             <ul>
               {theme.citations.map((citation, idx) => (
                 <li key={idx}>
-                  {citation.doc_id} (Page {citation.page}, Para{" "}
-                  {citation.paragraph})
+                  {citation.doc_id} (Page {citation.page}, Lines{" "}
+                  {citation.lines})
                 </li>
               ))}
             </ul>
@@ -321,7 +321,7 @@ const DocumentAnswers = ({ answers }) => {
               <td>{answer.doc_id}</td>
               <td>{answer.answer}</td>
               <td>
-                Page {answer.citation.page}, Para {answer.citation.paragraph}
+                Page {answer.citation.page}, line {answer.citation.lines}
               </td>
             </tr>
           ))}

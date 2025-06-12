@@ -1,24 +1,23 @@
-// src/chatbot-widget.js
-
-import React from "react";
 import ReactDOM from "react-dom";
 import ChatWidget from "./components/ChatWidget";
-// UMD export: exposes HealthcareAIWidget.init(...)
-const HealthcareAIWidget = {
+import "./components/ChatWidget.css";
+
+// UMD export: exposes ChatBotWidget.init(...)
+const ChatBotWidget = {
   init: (userConfig) => {
     // Default configuration
     const config = {
       container: "#healthcare-ai-container",
       baseUrl: "https://chatbot-theme-identifier-kzpk.onrender.com/",
-      companyName: "Appolo tyres",
+      companyName: "Apollo Tyres",
       companyLogo: "/logo.png",
       primaryColor: "#0066cc",
       showButton: true,
       showGreeting: true,
       greetingText: "Need help with our products? Chat with our AI assistant!",
       introductionText:
-        "Hello! I'm your apollo assistant. How can I help you today?",
-      inputPlaceholder: "Ask about tyres,or services...",
+        "Hello! I'm your Apollo assistant. How can I help you today?",
+      inputPlaceholder: "Ask about tyres or services...",
       ...userConfig,
     };
 
@@ -44,7 +43,7 @@ const HealthcareAIWidget = {
         button.className = "healthcare-ai-button";
         button.innerHTML = `
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path>
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
           </svg>
         `;
         document.body.appendChild(button);
@@ -65,16 +64,25 @@ const HealthcareAIWidget = {
           cursor: "pointer",
           boxShadow: "0 4px 8px rgba(0,0,0,0.2)",
           zIndex: "999",
+          transition: "all 0.3s ease",
         });
 
-        // Add click event to open chatbot with tracking
-        button.addEventListener("click", function () {
-          // Create a custom event that components can listen for
-          const event = new CustomEvent("chatbotOpened", {
-            detail: { method: "button_click" },
-          });
-          document.dispatchEvent(event);
-          window.openChatbot();
+        // Add hover effects
+        button.addEventListener("mouseenter", () => {
+          button.style.transform = "scale(1.05)";
+          button.style.boxShadow = "0 6px 12px rgba(0,0,0,0.3)";
+        });
+
+        button.addEventListener("mouseleave", () => {
+          button.style.transform = "scale(1)";
+          button.style.boxShadow = "0 4px 8px rgba(0,0,0,0.2)";
+        });
+
+        // Add click event to open chatbot
+        button.addEventListener("click", () => {
+          if (window.openChatbot) {
+            window.openChatbot();
+          }
         });
       }
     }
@@ -91,7 +99,7 @@ const HealthcareAIWidget = {
         greeting.innerHTML = `
           <p>${
             config.greetingText ||
-            "Need help with your tyres needs? Chat with our AI assistant!"
+            "Need help with your tyre needs? Chat with our AI assistant!"
           }</p>
           <span class="greeting-close">&times;</span>
         `;
@@ -122,23 +130,11 @@ const HealthcareAIWidget = {
             fontSize: "18px",
           });
 
-          closeBtn.addEventListener("click", function (e) {
+          closeBtn.addEventListener("click", (e) => {
             e.stopPropagation();
             greeting.classList.add("hidden");
           });
         }
-
-        // Also allow clicking greeting to open chatbot
-        greeting.addEventListener("click", function (e) {
-          if (
-            e.target !== greeting.querySelector(".greeting-close") &&
-            !greeting.contains(e.target)
-          ) {
-            e.preventDefault();
-            e.stopPropagation();
-            window.openChatbot();
-          }
-        });
 
         // Auto-hide greeting after 8 seconds
         setTimeout(() => {
@@ -149,38 +145,20 @@ const HealthcareAIWidget = {
       }
     }
 
-    // Render the React ChatWidget, spreading all userConfig entries as props
-    ReactDOM.render(<ChatWidget {...config} />, container);
+    // Render the React ChatWidget
+    ReactDOM.render(<ChatWidget config={config} />, container);
   },
 };
 
-export default HealthcareAIWidget;
-
-// Make chatbot opener available globally with tracking
+// Make chatbot functions available globally
 if (typeof window !== "undefined") {
-  window.openChatbot = function () {
+  window.openChatbot = () => {
     const chatbot = document.getElementById("chatbot");
     const button = document.getElementById("healthcare-ai-button");
     const greeting = document.getElementById("healthcare-ai-greeting");
 
-    // Track chatbot open event if not already tracked
-    if (chatbot && chatbot.style.display !== "block") {
-      // Create a custom event that components can listen for
-      const event = new CustomEvent("chatbotOpened", {
-        detail: { method: "global_function" },
-      });
-      document.dispatchEvent(event);
-
-      // Send analytics event directly via WebSocket if available
-      if (window.sendAnalyticsEvent) {
-        window.sendAnalyticsEvent("chatbot_opened", { method: "button_click" });
-      }
-    }
-
     if (chatbot) {
-      // First make sure it's visible (display block) before removing hidden class
       chatbot.style.display = "block";
-      // Use requestAnimationFrame to ensure display change takes effect first
       requestAnimationFrame(() => {
         chatbot.classList.remove("hidden");
       });
@@ -189,4 +167,20 @@ if (typeof window !== "undefined") {
     if (button) button.style.display = "none";
     if (greeting) greeting.style.display = "none";
   };
+
+  window.closeChatbot = () => {
+    const chatbot = document.getElementById("chatbot");
+    const button = document.getElementById("healthcare-ai-button");
+
+    if (chatbot) {
+      chatbot.classList.add("hidden");
+      setTimeout(() => {
+        chatbot.style.display = "none";
+      }, 300);
+    }
+
+    if (button) button.style.display = "flex";
+  };
 }
+
+export default ChatBotWidget;

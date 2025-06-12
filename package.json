@@ -15,7 +15,8 @@
     "start": "webpack serve --mode development",
     "clean": "rimraf dist",
     "prebuild": "npm run clean",
-    "build": "webpack --mode production"
+    "build": "webpack --mode production",
+    "serve": "cd dist && python -m http.server 8080"
   },
   "peerDependencies": {
     "react": "^18.2.0",
